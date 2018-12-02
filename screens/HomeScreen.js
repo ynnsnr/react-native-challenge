@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import Autolink from 'react-native-autolink';
 
+Expo.ScreenOrientation.allowAsync(Expo.ScreenOrientation.Orientation.PORTRAIT);
 const win = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = win.width;
 const HEADER_MIN_HEIGHT = 60;
@@ -60,7 +61,7 @@ export default class HomeScreen extends React.Component {
     });
 
     changeBarTitleOnScroll = () => {
-      if (this.state.scrollY._value >= 250) {
+      if (this.state.scrollY._value >= 260) {
         this.setState({ barTitleText: 'What\'s the best mak...' });
       } else {
         this.setState({ barTitleText: '1/1' });
@@ -69,7 +70,7 @@ export default class HomeScreen extends React.Component {
 
     onShare = () => {
       Share.share({
-        title: 'Male Up Tuition',
+        title: 'Make Up Tuition',
         subject: 'What\'s the best makeup products for the tropical wheather like Thailand?',
         url: 'https://www.ddlion.me',
       }, {
@@ -89,7 +90,7 @@ export default class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
 
-        <View>
+        <View style={this.state.scrollY._value >= 260 ? styles.navbar : null}>
           <ScrollView
              scrollEventThrottle={16}
              onScroll={Animated.event(
@@ -128,7 +129,6 @@ export default class HomeScreen extends React.Component {
           <Animated.View style={[styles.header, {height: headerHeight}]}>
             <LinearGradient style={{height: '100%'}}
               colors={[JSON.stringify(fade('black', 'transparent')), 'transparent']}
-              // colors={this.state.scrollY._value <= 250 ? ['black', 'transparent'] : ['transparent']}
             >
               <Animated.Image
                 source={require('../assets/images/photo-1512496015851-a90fb38ba796.jpg')}
@@ -141,7 +141,10 @@ export default class HomeScreen extends React.Component {
                 <Animated.Text style={{color: fade('white', '#fd5c63')}}>
                   <Icon size={24} name='ios-close-circle-outline' />
                 </Animated.Text>
-                <Animated.Text style={{color: fade('white', 'black'), fontWeight: 'bold', paddingTop: 4}}>
+                <Animated.Text style={{color: fade('white', 'black'),
+                                       fontWeight: 'bold',
+                                       paddingTop: 4}}
+                                       >
                   {this.state.barTitleText}
                 </Animated.Text>
                 <Animated.Text style={{color: fade('white', '#fd5c63')}}>
@@ -153,31 +156,29 @@ export default class HomeScreen extends React.Component {
         </View>
 
         <View style={styles.tabBarInfoContainer}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
 
-            <View style={{flex: 1, flexDirection: 'row'}}>
-              <Avatar rounded source={require('../assets/images/128.jpg')}/>
-              <View style={{marginLeft: 6, height: 32}}>
-                <View style={{flex: 1, flexDirection: 'row'}}>
-                  <Text style={{fontSize: 12}}>Lauren Levinson</Text>
-                  <Text style={styles.follow}>Follow</Text>
-                </View>
-                <Text style={styles.postDate}>5 Mins Ago</Text>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Avatar rounded source={require('../assets/images/128.jpg')}/>
+            <View style={{marginLeft: 6, height: 32}}>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <Text style={{fontSize: 12}}>Lauren Levinson</Text>
+                <Text style={styles.follow}>Follow</Text>
               </View>
+              <Text style={styles.postDate}>5 Mins Ago</Text>
             </View>
-
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-              <Icon name={this.state.liked ? 'ios-heart' : 'ios-heart-empty'}
-                    size={24}
-                    color='#fd5c63'
-                    onPress={like}
-                    />
-              <Text style={{color: '#fd5c63', marginLeft: 5}}>
-                {this.state.likes}
-              </Text>
-            </View>
-
           </View>
+
+          <View style={styles.likes}>
+            <Icon name={this.state.liked ? 'ios-heart' : 'ios-heart-empty'}
+                  size={24}
+                  color='#fd5c63'
+                  onPress={like}
+                  />
+            <Text style={{color: '#fd5c63', marginLeft: 5}}>
+              {this.state.likes}
+            </Text>
+          </View>
+
         </View>
 
       </View>
@@ -230,16 +231,6 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textAlign: 'center',
   },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
   tabBarInfoContainer: {
     position: 'absolute',
     bottom: 0,
@@ -261,6 +252,22 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingLeft: 14,
     paddingRight: 16,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  navbar: {
+    ...Platform.select({
+      ios: {
+        shadowColor: 'black',
+        shadowOffset: { height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 20,
+      },
+    }),
   },
   follow: {
     fontSize: 12,
@@ -282,20 +289,6 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#fbfbfb',
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
   },
   bar: {
     marginTop: 28,
@@ -319,4 +312,10 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
+  likes: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  }
 });
